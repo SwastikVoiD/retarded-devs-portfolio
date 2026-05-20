@@ -37,12 +37,15 @@ def login_required(f):
 # --- Access Logging Middleware ---
 @app.before_request
 def log_request():
-    if request.endpoint and not request.endpoint.startswith('static') and not request.endpoint.startswith('dashboard'):
-        ip = request.remote_addr
-        endpoint = request.path
-        log = AccessLog(ip_address=ip, endpoint=endpoint) # type: ignore
-        db.session.add(log)
-        db.session.commit()
+    if request.endpoint and not request.endpoint.startswith('static') and not request.endpoint.startswith('dashboard') and request.endpoint != 'seed':
+        try:
+            ip = request.remote_addr
+            endpoint = request.path
+            log = AccessLog(ip_address=ip, endpoint=endpoint) # type: ignore
+            db.session.add(log)
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
 
 # --- Public Routes ---
 @app.route('/seed')
