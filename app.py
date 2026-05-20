@@ -7,8 +7,19 @@ from models import db, Project, AccessLog, ContactMessage, TeamMember, Blog, Tea
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'retarded-devs-super-secret-key-123'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'team_portfolio.db')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'retarded-devs-super-secret-key-123')
+
+# Check for cloud database URL (Vercel/Production)
+database_url = os.environ.get('DATABASE_URL')
+if database_url:
+    # Fix older postgres:// schemas which SQLAlchemy doesn't support anymore
+    if database_url.startswith("postgres://"):
+        database_url = database_url.replace("postgres://", "postgresql://", 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+else:
+    # Fallback to local SQLite database
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'team_portfolio.db')
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
