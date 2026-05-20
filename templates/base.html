@@ -32,6 +32,28 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+    <!-- Cinematic Boot Screen -->
+    <div id="boot-screen">
+        <div class="boot-text-container">
+            <span id="boot-text"></span><span class="boot-cursor"></span>
+            
+            <div id="boot-loading-container" style="display: none; margin-top: 2rem;">
+                <div style="display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--accent-color);">
+                    <span>SYSTEM.INITIALIZE</span>
+                    <span id="boot-progress-text">00%</span>
+                </div>
+                <div style="width: 100%; height: 2px; background: rgba(255,255,255,0.1); position: relative; overflow: hidden;">
+                    <div id="boot-progress-bar" style="width: 0%; height: 100%; background: var(--accent-color); box-shadow: 0 0 10px var(--accent-color);"></div>
+                </div>
+                <div id="boot-encrypted-text" style="font-family: var(--font-mono); font-size: 0.75rem; color: rgba(255,255,255,0.3); margin-top: 0.5rem; letter-spacing: 2px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Jarvis Cursor -->
+    <div id="cursor-dot"></div>
+    <div id="cursor-ring"></div>
+
     <!-- Global 3D Mesh & Jarvis Particles -->
     <div class="parallax-mesh" id="parallax-mesh"></div>
     <canvas id="jarvis-canvas"></canvas>
@@ -219,5 +241,141 @@
         animate();
     </script>
     {% block extra_js %}{% endblock %}
+
+    <!-- Custom Interactions JS -->
+    <script>
+        // Custom Cursor Logic
+        const cursorDot = document.getElementById('cursor-dot');
+        const cursorRing = document.getElementById('cursor-ring');
+        
+        if (window.matchMedia("(pointer: fine)").matches) {
+            document.addEventListener('mousemove', (e) => {
+                cursorDot.style.left = e.clientX + 'px';
+                cursorDot.style.top = e.clientY + 'px';
+                
+                setTimeout(() => {
+                    cursorRing.style.left = e.clientX + 'px';
+                    cursorRing.style.top = e.clientY + 'px';
+                }, 50);
+            });
+
+            // Hover effects for all interactive elements
+            const addHoverEffect = () => {
+                const interactables = document.querySelectorAll('a, button, input, textarea, select, model-viewer');
+                interactables.forEach(el => {
+                    // Prevent multiple listeners if elements are dynamically added
+                    if (!el.dataset.cursorHovered) {
+                        el.dataset.cursorHovered = "true";
+                        el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+                        el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+                    }
+                });
+            };
+            addHoverEffect();
+            // Re-apply in case dynamic content loads
+            setInterval(addHoverEffect, 1000);
+        }
+
+        // Cinematic Boot Sequence Logic
+        const bootScreen = document.getElementById('boot-screen');
+        const bootTextEl = document.getElementById('boot-text');
+        const bootLoadingContainer = document.getElementById('boot-loading-container');
+        const bootProgressBar = document.getElementById('boot-progress-bar');
+        const bootProgressText = document.getElementById('boot-progress-text');
+        const bootEncryptedText = document.getElementById('boot-encrypted-text');
+        
+        // Changed key to force it to play again
+        if (!sessionStorage.getItem('jarvis_booted_v4')) {
+            const bootLines = [
+                "> Just a rather very intelligent system...",
+                "> Importing preferences from decentralized cluster...",
+                "> Calibrating virtual 3D environment...",
+                "> Bypassing security firewalls...",
+                "> We are online and ready."
+            ];
+            
+            let lineIndex = 0;
+            let charIndex = 0;
+            let currentLine = "";
+            let typingFinished = false;
+
+            function typeWriter() {
+                if (lineIndex < bootLines.length - 1) { // Stop before the very last line
+                    if (charIndex < bootLines[lineIndex].length) {
+                        currentLine += bootLines[lineIndex].charAt(charIndex);
+                        bootTextEl.innerHTML = currentLine;
+                        charIndex++;
+                        setTimeout(typeWriter, 15); // Faster typing
+                    } else {
+                        setTimeout(() => {
+                            lineIndex++;
+                            charIndex = 0;
+                            currentLine += "<br>";
+                            typeWriter();
+                        }, 300); // Pause between lines
+                    }
+                } else {
+                    typingFinished = true; // Waiting for progress bar to hit 100%
+                }
+            }
+
+            function startLoadingBar() {
+                bootLoadingContainer.style.display = 'block';
+                let progress = 0;
+                const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
+                
+                const interval = setInterval(() => {
+                    progress += Math.random() * 1.5; // Slower progress to match text typing duration
+                    if (progress >= 100) {
+                        progress = 100;
+                        clearInterval(interval);
+                        bootProgressText.innerText = "100%";
+                        bootProgressBar.style.width = "100%";
+                        bootEncryptedText.innerText = "ACCESS.GRANTED";
+                        bootEncryptedText.style.color = "var(--accent-color)";
+                        
+                        // Check if typing finished, print final line, and fade out
+                        const checkTyping = setInterval(() => {
+                            if(typingFinished) {
+                                clearInterval(checkTyping);
+                                currentLine += bootLines[bootLines.length - 1]; // "We are online and ready."
+                                bootTextEl.innerHTML = currentLine;
+                                
+                                setTimeout(() => {
+                                    bootScreen.classList.add('hidden');
+                                    sessionStorage.setItem('jarvis_booted_v4', 'true');
+                                }, 1200); // Pause before triggering the slow 2.5s CSS fade out
+                            }
+                        }, 100);
+                        
+                    } else {
+                        bootProgressBar.style.width = progress + "%";
+                        
+                        // Scramble the percentage text randomly
+                        if (Math.random() > 0.3) {
+                            bootProgressText.innerText = Math.floor(progress) + "%";
+                        } else {
+                            bootProgressText.innerText = charset.charAt(Math.floor(Math.random() * charset.length)) + charset.charAt(Math.floor(Math.random() * charset.length)) + "%";
+                        }
+                        
+                        // Scramble the encrypted string below the bar
+                        let encryptedStr = "";
+                        for(let i=0; i<35; i++) {
+                            encryptedStr += charset.charAt(Math.floor(Math.random() * charset.length));
+                        }
+                        bootEncryptedText.innerText = encryptedStr;
+                    }
+                }, 40);
+            }
+
+            // Start both concurrently
+            setTimeout(() => {
+                startLoadingBar();
+                typeWriter();
+            }, 500); 
+        } else {
+            bootScreen.style.display = 'none';
+        }
+    </script>
 </body>
 </html>
