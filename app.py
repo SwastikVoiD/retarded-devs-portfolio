@@ -1,5 +1,6 @@
 import os
 # pyrefly: ignore [missing-import]
+import traceback
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from functools import wraps
 from models import db, Project, AccessLog, ContactMessage, TeamMember, Blog, TeamInfo
@@ -23,6 +24,11 @@ else:
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    # This will catch all unhandled exceptions and print the traceback to the browser
+    return f"<pre>Internal Server Error\\n\\n{traceback.format_exc()}</pre>", 500
 
 # --- Authentication Middleware ---
 def login_required(f):
