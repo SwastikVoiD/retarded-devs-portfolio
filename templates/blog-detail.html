@@ -22,13 +22,72 @@
         max-width: 800px;
         margin: 0 auto 5rem;
         background: var(--surface-color);
-        padding: 3rem;
-        border-radius: 8px;
+        padding: 4rem;
+        border-radius: 12px;
         border: 1px solid var(--border-color);
         color: var(--text-primary);
         line-height: 1.8;
-        font-size: 1.1rem;
-        white-space: pre-wrap; /* Keeps line breaks from text area */
+        font-size: 1.15rem;
+    }
+    .blog-content h1, .blog-content h2, .blog-content h3 {
+        color: #ffffff;
+        margin-top: 2.5rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+    }
+    .blog-content h1 { font-size: 2.5rem; }
+    .blog-content h2 { font-size: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
+    .blog-content h3 { font-size: 1.5rem; }
+    .blog-content p {
+        margin-bottom: 1.5rem;
+        color: var(--text-secondary);
+    }
+    .blog-content p + p {
+        /* text-indent: 1.5rem; */ /* Optional editorial indent */
+    }
+    .blog-content ul, .blog-content ol {
+        margin-bottom: 1.5rem;
+        padding-left: 2rem;
+        color: var(--text-secondary);
+    }
+    .blog-content li {
+        margin-bottom: 0.5rem;
+    }
+    .blog-content blockquote {
+        border-left: 4px solid var(--accent-color);
+        padding-left: 1.5rem;
+        margin: 2rem 0;
+        font-style: italic;
+        color: #aaa;
+        background: rgba(229, 9, 20, 0.05);
+        padding: 1.5rem;
+        border-radius: 0 8px 8px 0;
+    }
+    .blog-content code {
+        background: #111;
+        padding: 0.2rem 0.4rem;
+        border-radius: 4px;
+        font-family: var(--font-mono);
+        font-size: 0.9em;
+        color: var(--accent-color);
+    }
+    .blog-content pre code {
+        background: transparent;
+        padding: 0;
+        color: inherit;
+    }
+    .blog-content pre {
+        background: #0a0a0a !important;
+        border: 1px solid #222;
+        border-radius: 8px;
+        padding: 1.5rem !important;
+        overflow-x: auto;
+        margin: 2rem 0;
+    }
+    .blog-content img {
+        max-width: 100%;
+        border-radius: 8px;
+        margin: 2rem 0;
     }
 </style>
 {% endblock %}
@@ -52,6 +111,6 @@
             </div>
         </header>
 
-        <article class="blog-content">{{ blog.content }}</article>
+        <article class="blog-content">{{ blog.content | markdown | safe }}</article>
     </div>
 {% endblock %}

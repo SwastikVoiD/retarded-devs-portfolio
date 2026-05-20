@@ -29,6 +29,9 @@
         .flash.warning { background-color: #ff9800; }
         .flash.info { background-color: #2196f3; }
     </style>
+    <!-- Prism.js Syntax Highlighting (Okaidia Dark Theme) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
+    
     {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -240,6 +243,12 @@
         
         animate();
     </script>
+    <!-- Prism.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    
     {% block extra_js %}{% endblock %}
 
     <!-- Custom Interactions JS -->

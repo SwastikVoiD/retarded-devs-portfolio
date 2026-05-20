@@ -75,7 +75,33 @@
     .resume-content {
         color: var(--text-secondary);
         line-height: 1.8;
-        white-space: pre-wrap; /* Keeps line breaks from text area */
+        font-size: 1.1rem;
+    }
+    .resume-content p {
+        margin-bottom: 1.5rem;
+    }
+    /* Editorial Indentation */
+    .resume-content p + p {
+        text-indent: 2rem;
+        margin-top: -0.5rem;
+    }
+    /* Drop-cap for the very first paragraph of the bio */
+    #bio-section .resume-content > p:first-of-type::first-letter {
+        float: left;
+        font-size: 4.5rem;
+        line-height: 0.8;
+        padding-top: 0.5rem;
+        padding-right: 0.75rem;
+        font-weight: 700;
+        color: var(--accent-color);
+        font-family: var(--font-serif);
+    }
+    .resume-content ul, .resume-content ol {
+        margin-bottom: 1.5rem;
+        padding-left: 2rem;
+    }
+    .resume-content li {
+        margin-bottom: 0.5rem;
     }
     
     @media (max-width: 768px) {
@@ -115,23 +141,23 @@
         </header>
         
         {% if member.full_bio %}
-        <section class="resume-section">
+        <section class="resume-section" id="bio-section">
             <h2><i data-feather="user"></i> Full Biography</h2>
-            <div class="resume-content">{{ member.full_bio }}</div>
+            <div class="resume-content">{{ member.full_bio | markdown | safe }}</div>
         </section>
         {% endif %}
 
         {% if member.experience %}
         <section class="resume-section">
             <h2><i data-feather="briefcase"></i> Experience & Background</h2>
-            <div class="resume-content">{{ member.experience }}</div>
+            <div class="resume-content">{{ member.experience | markdown | safe }}</div>
         </section>
         {% endif %}
 
         {% if member.contributions %}
         <section class="resume-section">
             <h2><i data-feather="award"></i> Team Contributions</h2>
-            <div class="resume-content">{{ member.contributions }}</div>
+            <div class="resume-content">{{ member.contributions | markdown | safe }}</div>
         </section>
         {% endif %}
     </div>

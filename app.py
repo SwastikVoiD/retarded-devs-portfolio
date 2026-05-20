@@ -1,6 +1,8 @@
 import os
 # pyrefly: ignore [missing-import]
 import traceback
+import markdown
+from markupsafe import Markup
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from functools import wraps
 from models import db, Project, AccessLog, ContactMessage, TeamMember, Blog, TeamInfo
@@ -29,6 +31,13 @@ db.init_app(app)
 def handle_exception(e):
     # This will catch all unhandled exceptions and print the traceback to the browser
     return f"<pre>Internal Server Error\\n\\n{traceback.format_exc()}</pre>", 500
+
+@app.template_filter('markdown')
+def markdown_filter(text):
+    if text:
+        # extensions=['fenced_code', 'codehilite'] for code highlighting support
+        return Markup(markdown.markdown(text, extensions=['fenced_code']))
+    return ""
 
 # --- Authentication Middleware ---
 def login_required(f):

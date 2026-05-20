@@ -27,6 +27,16 @@
         color: var(--text-secondary);
         font-size: 1.1rem;
         line-height: 1.8;
+        margin-bottom: 1rem;
+    }
+    .info-card p + p {
+        text-indent: 1.5rem;
+        margin-top: -0.5rem;
+    }
+    .info-card ul {
+        margin-bottom: 1rem;
+        padding-left: 1.5rem;
+        color: var(--text-secondary);
     }
     
     .team-grid {
@@ -100,15 +110,15 @@
         <div class="info-grid">
             <div class="info-card">
                 <h2>Our Mission</h2>
-                <p>{{ team_info.mission if team_info and team_info.mission else 'Mission statement not yet defined.' }}</p>
+                {{ (team_info.mission | markdown | safe) if team_info and team_info.mission else '<p>Mission statement not yet defined.</p>' | safe }}
             </div>
             <div class="info-card">
                 <h2>What We Do</h2>
-                <p>{{ team_info.what_we_do if team_info and team_info.what_we_do else 'Information not yet defined.' }}</p>
+                {{ (team_info.what_we_do | markdown | safe) if team_info and team_info.what_we_do else '<p>Information not yet defined.</p>' | safe }}
             </div>
             <div class="info-card">
                 <h2>Why We Do It</h2>
-                <p>{{ team_info.why_we_do if team_info and team_info.why_we_do else 'Information not yet defined.' }}</p>
+                {{ (team_info.why_we_do | markdown | safe) if team_info and team_info.why_we_do else '<p>Information not yet defined.</p>' | safe }}
             </div>
         </div>
 
