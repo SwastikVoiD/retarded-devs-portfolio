@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    .blog-header {
+        padding-top: 150px;
+        padding-bottom: 3rem;
+        max-width: 800px;
+        margin: 0 auto;
+        text-align: center;
+    }
+    .blog-meta {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        font-family: var(--font-mono);
+        color: var(--accent-color);
+        font-size: 0.9rem;
+        margin-bottom: 2rem;
+    }
+    .blog-content {
+        max-width: 800px;
+        margin: 0 auto 5rem;
+        background: var(--surface-color);
+        padding: 3rem;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        line-height: 1.8;
+        font-size: 1.1rem;
+        white-space: pre-wrap; /* Keeps line breaks from text area */
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <a href="{{ url_for('blogs') }}" style="color: var(--text-secondary); display: inline-flex; align-items: center; gap: 0.5rem; position: absolute; top: 100px;"><i data-feather="arrow-left"></i> All Blogs</a>
+        
+        <header class="blog-header">
+            <div class="blog-meta">
+                <span><i data-feather="calendar" style="width: 16px; vertical-align: text-bottom;"></i> {{ blog.timestamp.strftime('%B %d, %Y') }}</span>
+                <span><i data-feather="user" style="width: 16px; vertical-align: text-bottom;"></i> {{ blog.author }}</span>
+            </div>
+            <h1 class="hero-title" style="font-size: 3.5rem; margin-bottom: 1.5rem;">{{ blog.title }}</h1>
+            <div class="project-tags" style="justify-content: center;">
+                {% if blog.tags %}
+                    {% for tag in blog.tags.split(',') %}
+                    <span class="project-tag">{{ tag.strip() }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </header>
+
+        <article class="blog-content">{{ blog.content }}</article>
+    </div>
+{% endblock %}

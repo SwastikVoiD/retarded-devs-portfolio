@@ -1,0 +1,309 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    .dashboard-container {
+        padding-top: 100px;
+        min-height: 80vh;
+    }
+    .admin-grid {
+        display: grid;
+        grid-template-columns: 250px 1fr;
+        gap: 2rem;
+        margin-top: 2rem;
+        margin-bottom: 5rem;
+    }
+    .admin-nav {
+        background: var(--surface-color);
+        padding: 1.5rem;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+    }
+    .admin-nav h3 {
+        color: var(--accent-color);
+        margin-bottom: 1.5rem;
+    }
+    .admin-nav ul {
+        list-style: none;
+    }
+    .admin-nav li {
+        margin-bottom: 1rem;
+    }
+    .admin-nav a {
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .admin-nav a:hover, .admin-nav a.active {
+        color: #fff;
+    }
+    .admin-panel {
+        background: var(--surface-color);
+        padding: 2rem;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+    }
+    .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 1rem;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th, td {
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+    }
+    th {
+        color: var(--text-secondary);
+        font-family: var(--font-mono);
+        font-size: 0.85rem;
+        text-transform: uppercase;
+    }
+    tr:hover {
+        background-color: var(--surface-color-light);
+    }
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+    .form-group input, .form-group textarea {
+        width: 100%;
+        padding: 0.75rem;
+        background: var(--bg-color);
+        border: 1px solid var(--border-color);
+        color: #fff;
+        border-radius: 4px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="container dashboard-container">
+        <h2>Admin Dashboard</h2>
+        
+        <div class="admin-grid">
+            <aside class="admin-nav">
+                <h3>Navigation</h3>
+                <ul>
+                    <li><a href="#" onclick="showPanel('info')" class="active" id="nav-info"><i data-feather="info"></i> Team Info</a></li>
+                    <li><a href="#" onclick="showPanel('members')" id="nav-members"><i data-feather="users"></i> Members</a></li>
+                    <li><a href="#" onclick="showPanel('projects')" id="nav-projects"><i data-feather="box"></i> Projects</a></li>
+                    <li><a href="#" onclick="showPanel('blogs')" id="nav-blogs"><i data-feather="file-text"></i> Blogs</a></li>
+                    <li><a href="#" onclick="showPanel('messages')" id="nav-messages"><i data-feather="mail"></i> Messages</a></li>
+                    <li><a href="#" onclick="showPanel('logs')" id="nav-logs"><i data-feather="activity"></i> Access Logs</a></li>
+                    <li style="margin-top: 2rem;"><a href="{{ url_for('logout') }}"><i data-feather="log-out"></i> Logout</a></li>
+                </ul>
+            </aside>
+            
+            <main>
+                <!-- Team Info Panel -->
+                <div class="admin-panel" id="panel-info">
+                    <div class="panel-header">
+                        <h3>Edit Team Information</h3>
+                    </div>
+                    <form action="{{ url_for('edit_team_info') }}" method="POST">
+                        <div class="form-group">
+                            <label>Our Mission</label>
+                            <textarea name="mission" rows="3">{{ team_info.mission if team_info else '' }}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>What We Do</label>
+                            <textarea name="what_we_do" rows="4">{{ team_info.what_we_do if team_info else '' }}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Why We Do It</label>
+                            <textarea name="why_we_do" rows="4">{{ team_info.why_we_do if team_info else '' }}</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Information</button>
+                    </form>
+                </div>
+
+                <!-- Members Panel -->
+                <div class="admin-panel" id="panel-members" style="display: none;">
+                    <div class="panel-header">
+                        <h3>Manage Team Members</h3>
+                        <a href="{{ url_for('new_member') }}" class="btn btn-primary" style="padding: 0.5rem 1rem;">Add Member</a>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Role</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for member in members %}
+                            <tr>
+                                <td>{{ member.name }}</td>
+                                <td>{{ member.role }}</td>
+                                <td>
+                                    <div style="display:flex; gap: 0.5rem;">
+                                        <a href="{{ url_for('edit_member', id=member.id) }}" class="btn btn-outline" style="padding: 0.3rem 0.6rem; font-size: 0.8rem; margin:0;">Edit</a>
+                                        <form action="{{ url_for('delete_member', id=member.id) }}" method="POST" onsubmit="return confirm('Delete this member?');">
+                                            <button type="submit" class="btn btn-outline" style="padding: 0.3rem 0.6rem; font-size: 0.8rem; margin:0; border-color: #f44336; color: #f44336;">Delete</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="3">No members found.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Projects Panel -->
+                <div class="admin-panel" id="panel-projects" style="display: none;">
+                    <div class="panel-header">
+                        <h3>Manage Projects</h3>
+                        <a href="{{ url_for('new_project') }}" class="btn btn-primary" style="padding: 0.5rem 1rem;">Add Project</a>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for project in projects %}
+                            <tr>
+                                <td>{{ project.title }}</td>
+                                <td>{{ project.category }}</td>
+                                <td>
+                                    <div style="display:flex; gap: 0.5rem;">
+                                        <a href="{{ url_for('edit_project', project_id=project.id) }}" class="btn btn-outline" style="padding: 0.3rem 0.6rem; font-size: 0.8rem; margin:0;">Edit</a>
+                                        <form action="{{ url_for('delete_project', project_id=project.id) }}" method="POST" onsubmit="return confirm('Delete this project?');">
+                                            <button type="submit" class="btn btn-outline" style="padding: 0.3rem 0.6rem; font-size: 0.8rem; margin:0; border-color: #f44336; color: #f44336;">Delete</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="3">No projects found.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Blogs Panel -->
+                <div class="admin-panel" id="panel-blogs" style="display: none;">
+                    <div class="panel-header">
+                        <h3>Manage Blogs</h3>
+                        <a href="{{ url_for('new_blog') }}" class="btn btn-primary" style="padding: 0.5rem 1rem;">Write Blog</a>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for blog in blogs %}
+                            <tr>
+                                <td>{{ blog.title }}</td>
+                                <td>{{ blog.author }}</td>
+                                <td>{{ blog.timestamp.strftime('%Y-%m-%d') }}</td>
+                                <td>
+                                    <div style="display:flex; gap: 0.5rem;">
+                                        <a href="{{ url_for('edit_blog', id=blog.id) }}" class="btn btn-outline" style="padding: 0.3rem 0.6rem; font-size: 0.8rem; margin:0;">Edit</a>
+                                        <form action="{{ url_for('delete_blog', id=blog.id) }}" method="POST" onsubmit="return confirm('Delete this blog?');">
+                                            <button type="submit" class="btn btn-outline" style="padding: 0.3rem 0.6rem; font-size: 0.8rem; margin:0; border-color: #f44336; color: #f44336;">Delete</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="4">No blogs found.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Messages Panel -->
+                <div class="admin-panel" id="panel-messages" style="display: none;">
+                    <div class="panel-header">
+                        <h3>Contact Messages</h3>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Message</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for msg in messages %}
+                            <tr>
+                                <td style="white-space: nowrap;">{{ msg.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>{{ msg.name }}</td>
+                                <td>{{ msg.email }}</td>
+                                <td>{{ msg.message }}</td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="4">No messages yet.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Logs Panel -->
+                <div class="admin-panel" id="panel-logs" style="display: none;">
+                    <div class="panel-header">
+                        <h3>Access Logs (Recent 50)</h3>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>IP Address</th>
+                                <th>Endpoint</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in logs %}
+                            <tr>
+                                <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                <td>{{ log.ip_address }}</td>
+                                <td><span style="font-family: monospace; color: var(--accent-color);">{{ log.endpoint }}</span></td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="3">No logs found.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        function showPanel(panelName) {
+            document.querySelectorAll('.admin-panel').forEach(p => p.style.display = 'none');
+            document.querySelectorAll('.admin-nav a').forEach(a => a.classList.remove('active'));
+            
+            document.getElementById('panel-' + panelName).style.display = 'block';
+            document.getElementById('nav-' + panelName).classList.add('active');
+        }
+    </script>
+{% endblock %}

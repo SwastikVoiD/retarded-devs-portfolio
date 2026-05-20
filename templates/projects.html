@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+        .page-header {
+            padding-top: 120px;
+            padding-bottom: 3rem;
+            text-align: center;
+        }
+        .filter-container {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            background-color: rgba(255, 87, 34, 0.1);
+        }
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="container page-header">
+        <h1 class="hero-title" style="font-size: 3rem;">My Projects</h1>
+        <p class="hero-description" style="margin: 0 auto;">A comprehensive collection of my engineering and software work.</p>
+    </div>
+
+    <section class="section" style="padding-top: 0;">
+        <div class="container">
+            
+            <div class="filter-container">
+                <button class="filter-btn active" onclick="filterProjects('All')">All Projects</button>
+                <button class="filter-btn" onclick="filterProjects('Ongoing')">Ongoing</button>
+                <button class="filter-btn" onclick="filterProjects('Past')">Past Work</button>
+            </div>
+
+            <div class="project-grid" id="projects-grid">
+                {% for project in projects %}
+                <div class="project-card" data-status="{{ project.status }}">
+                    <div class="project-img-wrapper">
+                        <i data-feather="{{ project.icon }}"></i>
+                    </div>
+                    <div class="project-content">
+                        <div class="project-tags">
+                            <span class="project-tag" style="background-color: transparent; border-color: {% if project.status == 'Ongoing' %}#4caf50{% else %}var(--text-secondary){% endif %}; color: {% if project.status == 'Ongoing' %}#4caf50{% else %}var(--text-secondary){% endif %};">{{ project.status }}</span>
+                            {% if project.tags %}
+                                {% for tag in project.tags.split(',') %}
+                                <span class="project-tag">{{ tag.strip() }}</span>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <h3 class="project-title">{{ project.title }}</h3>
+                        <p class="project-desc">{{ project.short_description }}</p>
+                        <div class="project-links">
+                            <a href="{{ url_for('project_detail', project_id=project.id) }}">View Details <i data-feather="arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <p style="color: var(--text-secondary);">No projects added yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function filterProjects(status) {
+            // Update active button
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => {
+                if (btn.innerText.includes(status) || (status === 'All' && btn.innerText === 'All Projects')) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // Filter cards
+            const cards = document.querySelectorAll('.project-card');
+            cards.forEach(card => {
+                if (status === 'All' || card.getAttribute('data-status') === status) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
+{% endblock %}

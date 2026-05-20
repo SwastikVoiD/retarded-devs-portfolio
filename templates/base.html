@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Retarded Devs | Team Portfolio{% endblock %}</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/favicon.svg') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .flash-messages {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 2000;
+        }
+        .flash {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .flash.success { background-color: #4caf50; }
+        .flash.error { background-color: #f44336; }
+        .flash.warning { background-color: #ff9800; }
+        .flash.info { background-color: #2196f3; }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Global 3D Mesh & Jarvis Particles -->
+    <div class="parallax-mesh" id="parallax-mesh"></div>
+    <canvas id="jarvis-canvas"></canvas>
+
+    <nav class="navbar">
+        <div class="container">
+            <a href="{{ url_for('index') }}" class="navbar-brand">
+                <img src="{{ url_for('static', filename='img/logo.jpeg') }}" alt="Rd. Logo" class="navbar-logo" onerror="this.onerror=null; this.outerHTML='<span style=\'color: var(--accent-color); font-size: 1.5rem; font-family: var(--font-serif);\'>Rd.</span>';">
+            </a>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}active{% endif %}">Home</a></li>
+                <li><a href="{{ url_for('about') }}" class="{% if request.endpoint in ['about', 'team_member'] %}active{% endif %}">About Us</a></li>
+                <li><a href="{{ url_for('projects') }}" class="{% if request.endpoint in ['projects', 'project_detail'] %}active{% endif %}">Projects</a></li>
+                <li><a href="{{ url_for('blogs') }}" class="{% if request.endpoint in ['blogs', 'blog_detail'] %}active{% endif %}">Blogs</a></li>
+                <li><a href="{{ url_for('index') }}#contact">Contact</a></li>
+                {% if session.get('logged_in') %}
+                <li><a href="{{ url_for('dashboard') }}" style="color: var(--accent-color);">Dashboard</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <div class="flash-messages">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+    </div>
+
+    {% block content %}
+    {% endblock %}
+
+    <footer class="footer">
+        <div class="container">
+            <p class="footer-text">Built by Retarded Devs. &copy; 2026.</p>
+        </div>
+    </footer>
+
+    <script>
+      feather.replace();
+    </script>
+    <script>
+        // Global Jarvis Particle Network with Mouse Interaction
+        const canvas = document.getElementById('jarvis-canvas');
+        const ctx = canvas.getContext('2d');
+        const parallaxMesh = document.getElementById('parallax-mesh');
+        
+        let width, height;
+        let particles = [];
+        
+        // Mouse tracking globally
+        let mouse = {
+            x: null,
+            y: null,
+            radius: 150 // Interaction radius
+        };
+
+        document.addEventListener('mousemove', function(event) {
+            mouse.x = event.clientX;
+            mouse.y = event.clientY;
+        });
+
+        document.addEventListener('mouseleave', function() {
+            mouse.x = null;
+            mouse.y = null;
+        });
+        
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        
+        window.addEventListener('resize', resize);
+        resize();
+        
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.baseVx = (Math.random() - 0.5) * 0.5;
+                this.baseVy = (Math.random() - 0.5) * 0.5;
+                this.vx = this.baseVx;
+                this.vy = this.baseVy;
+                this.radius = Math.random() * 2 + 1;
+            }
+            
+            update() {
+                // Mouse interaction
+                if (mouse.x != null && mouse.y != null) {
+                    let dx = mouse.x - this.x;
+                    let dy = mouse.y - this.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < mouse.radius) {
+                        const forceDirectionX = dx / distance;
+                        const forceDirectionY = dy / distance;
+                        const force = (mouse.radius - distance) / mouse.radius;
+                        const repelStrength = force * 2;
+
+                        this.vx -= forceDirectionX * repelStrength;
+                        this.vy -= forceDirectionY * repelStrength;
+                    } else {
+                        this.vx = this.vx * 0.9 + this.baseVx * 0.1;
+                        this.vy = this.vy * 0.9 + this.baseVy * 0.1;
+                    }
+                } else {
+                    this.vx = this.vx * 0.9 + this.baseVx * 0.1;
+                    this.vy = this.vy * 0.9 + this.baseVy * 0.1;
+                }
+
+                if (Math.abs(this.vx) > 3) this.vx *= 0.8;
+                if (Math.abs(this.vy) > 3) this.vy *= 0.8;
+
+                this.x += this.vx;
+                this.y += this.vy;
+                
+                if (this.x < 0 || this.x > width) {
+                    this.vx *= -1;
+                    this.baseVx *= -1;
+                }
+                if (this.y < 0 || this.y > height) {
+                    this.vy *= -1;
+                    this.baseVy *= -1;
+                }
+            }
+            
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(214, 40, 40, 0.7)';
+                ctx.fill();
+            }
+        }
+        
+        for (let i = 0; i < 90; i++) {
+            particles.push(new Particle());
+        }
+        
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < 120) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(214, 40, 40, ${0.5 - distance / 240})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+
+                if (mouse.x != null && mouse.y != null) {
+                    const dx = particles[i].x - mouse.x;
+                    const dy = particles[i].y - mouse.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < mouse.radius) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(214, 40, 40, ${0.8 - distance / mouse.radius})`;
+                        ctx.lineWidth = 1;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(mouse.x, mouse.y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            
+            requestAnimationFrame(animate);
+        }
+        
+        animate();
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

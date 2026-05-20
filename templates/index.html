@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <header class="hero" id="home">
+
+        <div class="container hero-content fade-in-up">
+            <h1 class="hero-title">Retarded Developers.</h1>
+            <span class="hero-subtitle">We create what we like...</span>
+            <p class="hero-description" style="margin-top: 1.5rem;">
+                A collective of developers, engineers, and designers. We bridge the gap between complex requirements and elegant, robust digital solutions.
+            </p>
+            <div>
+                <a href="{{ url_for('projects') }}" class="btn btn-primary">View Our Work</a>
+                <a href="{{ url_for('about') }}" class="btn btn-outline">Meet The Team</a>
+            </div>
+        </div>
+    </header>
+
+    <section class="section" id="featured-projects">
+        <div class="container">
+            <h2 class="section-title">Featured Work</h2>
+            
+            <div class="project-grid">
+                {% for project in projects %}
+                <div class="project-card">
+                    <div class="project-img-wrapper">
+                        <i data-feather="{{ project.icon }}"></i>
+                    </div>
+                    <div class="project-content">
+                        <div class="project-tags">
+                            <span class="project-tag" style="background-color: transparent; border-color: {% if project.status == 'Ongoing' %}#4caf50{% else %}var(--text-secondary){% endif %}; color: {% if project.status == 'Ongoing' %}#4caf50{% else %}var(--text-secondary){% endif %};">{{ project.status }}</span>
+                            {% if project.tags %}
+                                {% for tag in project.tags.split(',') %}
+                                <span class="project-tag">{{ tag.strip() }}</span>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <h3 class="project-title">{{ project.title }}</h3>
+                        <p class="project-desc">{{ project.short_description }}</p>
+                        <div class="project-links">
+                            <a href="{{ url_for('project_detail', project_id=project.id) }}">View Details <i data-feather="arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <p style="color: var(--text-secondary);">No projects added yet.</p>
+                {% endfor %}
+            </div>
+            
+            <div style="text-align: center; margin-top: 3rem;">
+                <a href="{{ url_for('projects') }}" class="btn btn-outline" style="margin-left: 0;">View All Projects</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Latest Blogs Section -->
+    <section class="section" id="latest-blogs">
+        <div class="container">
+            <h2 class="section-title">Latest Thoughts</h2>
+            
+            <div class="project-grid">
+                {% for blog in blogs %}
+                <div class="project-card" style="background-color: var(--surface-color);">
+                    <div class="project-content">
+                        <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-color); margin-bottom: 0.5rem;">
+                            {{ blog.timestamp.strftime('%B %d, %Y') }}
+                        </div>
+                        <h3 class="project-title">{{ blog.title }}</h3>
+                        <p class="project-desc" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                            {{ blog.content }}
+                        </p>
+                        <div class="project-links" style="justify-content: space-between; margin-top: auto;">
+                            <span style="font-size: 0.8rem; color: var(--text-secondary);">By {{ blog.author }}</span>
+                            <a href="{{ url_for('blog_detail', blog_id=blog.id) }}">Read More <i data-feather="arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <p style="color: var(--text-secondary);">No blogs posted yet.</p>
+                {% endfor %}
+            </div>
+            
+            <div style="text-align: center; margin-top: 3rem;">
+                <a href="{{ url_for('blogs') }}" class="btn btn-outline" style="margin-left: 0;">View All Blogs</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Form Section -->
+    <section class="section" id="contact">
+        <div class="container" style="max-width: 600px;">
+            <h2 class="section-title" style="justify-content: center; margin-bottom: 1.5rem;">Reach Out</h2>
+            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 3rem;">Want to collaborate or hire the team? Leave your details below.</p>
+            
+            <form action="{{ url_for('index') }}" method="POST" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <div>
+                    <label style="display:block; margin-bottom: 0.5rem; color: var(--text-secondary);">Name</label>
+                    <input type="text" name="name" required style="width: 100%; padding: 0.75rem; background: var(--bg-color); border: 1px solid var(--border-color); color: #fff; border-radius: 4px;">
+                </div>
+                <div>
+                    <label style="display:block; margin-bottom: 0.5rem; color: var(--text-secondary);">Email</label>
+                    <input type="email" name="email" required style="width: 100%; padding: 0.75rem; background: var(--bg-color); border: 1px solid var(--border-color); color: #fff; border-radius: 4px;">
+                </div>
+                <div>
+                    <label style="display:block; margin-bottom: 0.5rem; color: var(--text-secondary);">Message</label>
+                    <textarea name="message" rows="5" required style="width: 100%; padding: 0.75rem; background: var(--bg-color); border: 1px solid var(--border-color); color: #fff; border-radius: 4px; resize: vertical;"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Send Message</button>
+            </form>
+        </div>
+    </section>
+{% endblock %}

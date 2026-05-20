@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    .edit-container {
+        padding-top: 100px;
+        min-height: 80vh;
+        max-width: 800px;
+    }
+    .form-card {
+        background: var(--surface-color);
+        padding: 2rem;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        margin-top: 2rem;
+        margin-bottom: 4rem;
+    }
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+    .form-group input, .form-group select, .form-group textarea {
+        width: 100%;
+        padding: 0.75rem;
+        background: var(--bg-color);
+        border: 1px solid var(--border-color);
+        color: #fff;
+        border-radius: 4px;
+    }
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="container edit-container">
+        <a href="{{ url_for('dashboard') }}" style="color: var(--text-secondary); display: inline-flex; align-items: center; gap: 0.5rem;"><i data-feather="arrow-left"></i> Back to Dashboard</a>
+        
+        <h2 style="margin-top: 1.5rem;">{% if project %}Edit Project{% else %}New Project{% endif %}</h2>
+        
+        <div class="form-card">
+            <form action="{{ url_for('edit_project', project_id=project.id) if project else url_for('new_project') }}" method="POST">
+                
+                <h3 style="color: var(--accent-color); margin-bottom: 1rem; font-size: 1.1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">Basic Info</h3>
+                <div class="form-group">
+                    <label>Project Title *</label>
+                    <input type="text" name="title" value="{{ project.title if project else '' }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Short Description *</label>
+                    <input type="text" name="short_description" value="{{ project.short_description if project else '' }}" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <select name="category" required>
+                            <option value="Mechatronics" {% if project and project.category == 'Mechatronics' %}selected{% endif %}>Mechatronics</option>
+                            <option value="Computer Vision" {% if project and project.category == 'Computer Vision' %}selected{% endif %}>Computer Vision</option>
+                            <option value="Thermal Systems" {% if project and project.category == 'Thermal Systems' %}selected{% endif %}>Thermal Systems</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Status *</label>
+                        <select name="status" required>
+                            <option value="Ongoing" {% if project and project.status == 'Ongoing' %}selected{% endif %}>Ongoing</option>
+                            <option value="Past" {% if not project or project.status == 'Past' %}selected{% endif %}>Past</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Feather Icon Name</label>
+                        <input type="text" name="icon" value="{{ project.icon if project else 'cpu' }}" placeholder="e.g. cpu, eye, wind">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Tags (comma separated)</label>
+                    <input type="text" name="tags" value="{{ project.tags if project else '' }}" placeholder="e.g. Python, ROS, SolidWorks">
+                </div>
+
+                <h3 style="color: var(--accent-color); margin-top: 2rem; margin-bottom: 1rem; font-size: 1.1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">Detailed Content</h3>
+                
+                <div class="form-group">
+                    <label>Overview</label>
+                    <textarea name="overview" rows="4">{{ project.overview if project else '' }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Challenges & Solutions</label>
+                    <textarea name="challenges" rows="4">{{ project.challenges if project else '' }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Iterations & Modifications</label>
+                    <textarea name="modifications" rows="4">{{ project.modifications if project else '' }}</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Results & Future Work</label>
+                    <textarea name="results" rows="4">{{ project.results if project else '' }}</textarea>
+                </div>
+
+                <h3 style="color: var(--accent-color); margin-top: 2rem; margin-bottom: 1rem; font-size: 1.1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">Metadata</h3>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Timeline</label>
+                        <input type="text" name="timeline" value="{{ project.timeline if project else '' }}">
+                    </div>
+                    <div class="form-group">
+                        <label>Role</label>
+                        <input type="text" name="role" value="{{ project.role if project else '' }}">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Technologies Used (comma separated)</label>
+                    <input type="text" name="technologies" value="{{ project.technologies if project else '' }}">
+                </div>
+
+                <div class="form-group">
+                    <label>GitHub/External Link</label>
+                    <input type="url" name="github_link" value="{{ project.github_link if project else '' }}">
+                </div>
+
+                <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                    <button type="submit" class="btn btn-primary">Save Project</button>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

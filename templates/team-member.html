@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    .profile-header {
+        padding-top: 150px;
+        padding-bottom: 4rem;
+        display: flex;
+        align-items: center;
+        gap: 4rem;
+    }
+    .profile-avatar {
+        width: 300px;
+        height: 300px;
+        border-radius: 50%;
+        border: 4px solid var(--surface-color);
+        box-shadow: 0 0 0 2px var(--accent-color);
+        object-fit: cover;
+    }
+    .profile-info h1 {
+        font-size: 3.5rem;
+        margin-bottom: 0.5rem;
+    }
+    .profile-role {
+        font-family: var(--font-mono);
+        color: var(--accent-color);
+        font-size: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+    .profile-bio {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        line-height: 1.8;
+        max-width: 600px;
+        margin-bottom: 2rem;
+    }
+    .social-links {
+        display: flex;
+        gap: 1rem;
+    }
+    .social-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: var(--surface-color);
+        color: #fff;
+        border: 1px solid var(--border-color);
+        transition: all 0.3s;
+    }
+    .social-link:hover {
+        background: var(--accent-color);
+        border-color: var(--accent-color);
+    }
+    
+    .resume-section {
+        background: var(--surface-color);
+        padding: 3rem;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        margin-bottom: 3rem;
+    }
+    .resume-section h2 {
+        font-size: 1.75rem;
+        color: #fff;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 1rem;
+    }
+    .resume-content {
+        color: var(--text-secondary);
+        line-height: 1.8;
+        white-space: pre-wrap; /* Keeps line breaks from text area */
+    }
+    
+    @media (max-width: 768px) {
+        .profile-header {
+            flex-direction: column;
+            text-align: center;
+        }
+        .profile-bio {
+            margin: 0 auto 2rem;
+        }
+        .social-links {
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <a href="{{ url_for('about') }}" style="color: var(--text-secondary); display: inline-flex; align-items: center; gap: 0.5rem; position: absolute; top: 100px;"><i data-feather="arrow-left"></i> Back to Team</a>
+        
+        <header class="profile-header">
+            <img src="{{ member.image_url }}" alt="{{ member.name }}" class="profile-avatar">
+            <div class="profile-info">
+                <h1>{{ member.name }}</h1>
+                <div class="profile-role">{{ member.role }}</div>
+                <p class="profile-bio">{{ member.short_bio }}</p>
+                <div class="social-links">
+                    {% if member.github_link %}
+                    <a href="{{ member.github_link }}" target="_blank" class="social-link"><i data-feather="github"></i></a>
+                    {% endif %}
+                    {% if member.twitter_link %}
+                    <a href="{{ member.twitter_link }}" target="_blank" class="social-link"><i data-feather="twitter"></i></a>
+                    {% endif %}
+                </div>
+            </div>
+        </header>
+        
+        {% if member.full_bio %}
+        <section class="resume-section">
+            <h2><i data-feather="user"></i> Full Biography</h2>
+            <div class="resume-content">{{ member.full_bio }}</div>
+        </section>
+        {% endif %}
+
+        {% if member.experience %}
+        <section class="resume-section">
+            <h2><i data-feather="briefcase"></i> Experience & Background</h2>
+            <div class="resume-content">{{ member.experience }}</div>
+        </section>
+        {% endif %}
+
+        {% if member.contributions %}
+        <section class="resume-section">
+            <h2><i data-feather="award"></i> Team Contributions</h2>
+            <div class="resume-content">{{ member.contributions }}</div>
+        </section>
+        {% endif %}
+    </div>
+{% endblock %}
