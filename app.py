@@ -40,7 +40,7 @@ def log_request():
     if request.endpoint and not request.endpoint.startswith('static') and not request.endpoint.startswith('dashboard'):
         ip = request.remote_addr
         endpoint = request.path
-        log = AccessLog(ip_address=ip, endpoint=endpoint)
+        log = AccessLog(ip_address=ip, endpoint=endpoint) # type: ignore
         db.session.add(log)
         db.session.commit()
 
@@ -52,7 +52,7 @@ def seed():
         db.drop_all()
         db.create_all()
         
-        p1 = Project(
+        p1 = Project( # type: ignore
             title="Project Alpha: Core Systems",
             short_description="A complete overhaul of our backend infrastructure with 3D data visualization.",
             category="Backend",
@@ -70,7 +70,7 @@ def seed():
         )
         db.session.add(p1)
         
-        p2 = Project(
+        p2 = Project( # type: ignore
             title="UI/UX Reimagined",
             short_description="Building a next-generation fluid presentation interface.",
             category="Frontend",
@@ -86,17 +86,7 @@ def seed():
         )
         db.session.add(p2)
         
-        import shutil, os
-        avatar_src = r"C:\Users\swast\.gemini\antigravity\brain\4cfdaf7c-3082-4642-9c3c-28e6f4e7f9e1\cyberpunk_avatar_1779252578766.png"
-        img_dir = os.path.join(basedir, 'static', 'img')
-        os.makedirs(img_dir, exist_ok=True)
-        avatar_path = os.path.join(img_dir, 'avatar1.png')
-        try:
-            shutil.copy(avatar_src, avatar_path)
-        except:
-            pass
-            
-        t1 = TeamMember(
+        t1 = TeamMember( # type: ignore
             name="Cipher",
             role="Lead Developer",
             short_bio="Specializes in backend architecture and 3D web integration. Loves building complex systems that run invisibly behind beautiful interfaces.",
@@ -107,7 +97,7 @@ def seed():
             github_link="https://github.com",
             twitter_link="https://linkedin.com"
         )
-        t2 = TeamMember(
+        t2 = TeamMember( # type: ignore
             name="Ghost",
             role="UI/UX Designer",
             short_bio="The creative mind behind the pure black aesthetic and the fluid presentation layouts. Turns raw data into visual art.",
@@ -119,7 +109,7 @@ def seed():
         )
         db.session.add_all([t1, t2])
         
-        info = TeamInfo(
+        info = TeamInfo( # type: ignore
             mission="To build the most aesthetic and performant digital experiences on the web.",
             what_we_do="We specialize in deep-tech backend engineering combined with immersive, cutting-edge frontend design.",
             why_we_do="Because standard web templates are boring, and we believe in pushing the boundaries of what browsers can do."
@@ -139,7 +129,7 @@ def index():
         email = request.form.get('email')
         message_text = request.form.get('message')
         if name and email and message_text:
-            msg = ContactMessage(name=name, email=email, message=message_text)
+            msg = ContactMessage(name=name, email=email, message=message_text) # type: ignore
             db.session.add(msg)
             db.session.commit()
             flash('Thank you for reaching out! We will get back to you soon.', 'success')
@@ -234,7 +224,7 @@ def edit_team_info():
 @login_required
 def new_member():
     if request.method == 'POST':
-        new_m = TeamMember(
+        new_m = TeamMember( # type: ignore
             name=request.form.get('name'),
             role=request.form.get('role'),
             short_bio=request.form.get('short_bio'),
@@ -285,7 +275,7 @@ def delete_member(id):
 @login_required
 def new_blog():
     if request.method == 'POST':
-        b = Blog(
+        b = Blog( # type: ignore
             title=request.form.get('title'),
             content=request.form.get('content'),
             author=request.form.get('author'),
@@ -325,7 +315,7 @@ def delete_blog(id):
 @login_required
 def new_project():
     if request.method == 'POST':
-        new_proj = Project(
+        new_proj = Project( # type: ignore
             title=request.form.get('title'),
             short_description=request.form.get('short_description'),
             category=request.form.get('category'),
@@ -385,7 +375,7 @@ def init_db():
         db.create_all()
         # Seed some data if empty
         if not TeamInfo.query.first():
-            info = TeamInfo(
+            info = TeamInfo( # type: ignore
                 mission="We build robust, intelligent systems. Bridging the gap between code and reality.",
                 what_we_do="We are a collective of developers, engineers, and designers working on cutting-edge software and hardware integration.",
                 why_we_do="Because standard solutions aren't good enough. We build things because we love to build."
